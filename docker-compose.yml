@@ -1,0 +1,71 @@
+version: '3.5'
+
+services:
+  nginx:
+    build:
+      context: ./docker/
+      dockerfile: nginx.docker
+    volumes:
+      - ./myapp:/app
+    depends_on:
+      - php-fpm
+      - php-fpm-dev
+    ports:
+      - "9000:80"
+      - "9001:81"
+  php-fpm:
+    build:
+      context: ./docker/
+      dockerfile: php-fpm.docker
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.27.0.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+    volumes:
+      - ./myapp:/app
+    depends_on:
+      - mysql
+  php-fpm-dev:
+    build:
+      context: ./docker/
+      dockerfile: php-fpm-dev.docker
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.27.0.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+    volumes:
+      - ./myapp:/app
+    depends_on:
+      - mysql
+  php-cli:
+    build:
+      context: ./docker/
+      dockerfile: php-cli.docker
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.27.0.1 remote_enable=1"
+      PHP_IDE_CONFIG: "serverName=Docker"
+    volumes:
+      - ./myapp:/app
+      - composer:/root/.composer/cache
+    depends_on:
+      - mysql
+  mysql:
+    image: mariadb:10.4.12
+    command: --sql_mode=NO_ENGINE_SUBSTITUTION
+    ports:
+      - 33006:3306
+    volumes:
+      - mysql_data:/var/lib/mysql_docker/
+    environment:
+      MYSQL_ROOT_PASSWORD: tables
+      MYSQL_DATABASE: api-sms
+      MYSQL_USER: bobby
+      MYSQL_PASSWORD: tables
+volumes:
+  mysql_data:
+  composer:
+networks:
+  default:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.27.0.0/24
