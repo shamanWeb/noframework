@@ -53,10 +53,10 @@ services:
     ports:
       - 33006:3306
     volumes:
-      - mysql_data:/var/lib/mysql_docker/
+      - ./mysql_data:/var/lib/mysql_docker/
     environment:
       MYSQL_ROOT_PASSWORD: tables
-      MYSQL_DATABASE: api-sms
+      MYSQL_DATABASE: paytest
       MYSQL_USER: bobby
       MYSQL_PASSWORD: tables
 volumes:
